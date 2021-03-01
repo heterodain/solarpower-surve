@@ -7,7 +7,7 @@
     </encoder>
   </appender>
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>appication.log</file>
+    <file>application.log</file>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
     </filter>
