@@ -1,0 +1,16 @@
+# デバイス設定
+device:
+  pv-controller:
+    com-port: "COM8"
+    unit-id: 1
+
+# サービス設定
+service:
+  ambient-realtime:
+    channel-id: 99999
+    read-key: "****************"
+    write-key: "****************"
+  ambient-daily:
+    channel-id: 99999
+    read-key: "****************"
+    write-key: "****************"
