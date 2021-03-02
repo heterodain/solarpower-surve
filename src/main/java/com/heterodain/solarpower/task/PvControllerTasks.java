@@ -37,8 +37,8 @@ public class PvControllerTasks {
 
     private SerialConnection conn;
 
-    private PvDataSummary summary = new PvDataSummary();
-    private PvDataSummary daily = new PvDataSummary();
+    private PvDataSummary instant = new PvDataSummary();
+    private PvDataSummary hourly = new PvDataSummary();
 
     /**
      * 初期化
@@ -70,10 +70,12 @@ public class PvControllerTasks {
             var data = pvService.readCurrent(settings.getDevice().getPvController(), conn);
             log.debug("{}", data);
 
-            synchronized (summary) {
-                summary.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
+            synchronized (instant) {
+                instant.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
                         data.getLoadPower());
-                daily.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
+            }
+            synchronized (hourly) {
+                hourly.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
                         data.getLoadPower());
             }
         } catch (Exception e) {
@@ -88,9 +90,9 @@ public class PvControllerTasks {
     public void summary() {
         try {
             PvData average;
-            synchronized (summary) {
-                average = summary.average();
-                summary.clear();
+            synchronized (instant) {
+                average = instant.average();
+                instant.clear();
             }
             log.debug("Ambientに3分値を送信します。data={}", average);
 
@@ -102,20 +104,20 @@ public class PvControllerTasks {
     }
 
     /**
-     * 1日毎にAmbientにデータ送信
+     * 1時間毎にAmbientにデータ送信
      */
     @Scheduled(cron = "0 0 * * * *")
     public void daily() {
         try {
             PvData average;
-            synchronized (daily) {
-                average = daily.average();
-                daily.clear();
+            synchronized (hourly) {
+                average = hourly.average();
+                hourly.clear();
             }
-            log.debug("Ambientに日計値を送信します。data={}", average);
+            log.debug("Ambientに時間値を送信します。data={}", average);
 
             ambientService.send(settings.getService().getAmbientDaily(),
-                    ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS), average.getPvPower(), average.getBattPower(),
+                    ZonedDateTime.now().truncatedTo(ChronoUnit.HOURS), average.getPvPower(), average.getBattPower(),
                     average.getLoadPower());
         } catch (Exception e) {
             log.warn("Ambientへのデータ送信に失敗しました。", e);
