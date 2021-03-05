@@ -6,7 +6,11 @@ device:
 
 # サービス設定
 service:
-  ambient:
+  ambient-realtime:
+    channel-id: 99999
+    read-key: "****************"
+    write-key: "****************"
+  ambient-daily:
     channel-id: 99999
     read-key: "****************"
     write-key: "****************"

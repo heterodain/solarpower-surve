@@ -95,7 +95,7 @@ public class PvControllerTasks {
             }
             log.debug("Ambientに3分値を送信します。data={}", average);
 
-            ambientService.send(settings.getService().getAmbient(), ZonedDateTime.now(), average.getPvVolt(),
+            ambientService.send(settings.getService().getAmbientRealtime(), ZonedDateTime.now(), average.getPvVolt(),
                     average.getPvPower(), average.getBattVolt(), average.getBattPower(), average.getLoadPower());
         } catch (Exception e) {
             log.warn("Ambientへのデータ送信に失敗しました。", e);
@@ -115,8 +115,9 @@ public class PvControllerTasks {
             }
             log.debug("Ambientに日計値を送信します。data={}", average);
 
-            ambientService.send(settings.getService().getAmbient(), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS),
-                    null, null, null, null, null, average.getPvPower(), average.getBattPower(), average.getLoadPower());
+            ambientService.send(settings.getService().getAmbientDaily(),
+                    ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS), average.getPvPower(), average.getBattPower(),
+                    average.getLoadPower());
         } catch (Exception e) {
             log.warn("Ambientへのデータ送信に失敗しました。", e);
         }

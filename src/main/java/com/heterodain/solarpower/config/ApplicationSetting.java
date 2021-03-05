@@ -25,8 +25,10 @@ public class ApplicationSetting {
 
     @Data
     public static class Service {
-        /* Ambientの設定 */
-        private Ambient ambient;
+        /* Ambientの設定(3分値) */
+        private Ambient ambientRealtime;
+        /* Ambientの設定(日計値) */
+        private Ambient ambientDaily;
     }
 
     /**
