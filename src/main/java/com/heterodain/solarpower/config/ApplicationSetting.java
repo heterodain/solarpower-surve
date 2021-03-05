@@ -19,16 +19,14 @@ public class ApplicationSetting {
 
     @Data
     public static class Device {
-        // チャージコントローラーの設定
+        /* チャージコントローラーの設定 */
         private PvController pvController;
     }
 
     @Data
     public static class Service {
-        // Ambientの設定(2分値)
-        private Ambient ambientRealtime;
-        // Ambientの設定(日計値)
-        private Ambient ambientDaily;
+        /* Ambientの設定 */
+        private Ambient ambient;
     }
 
     /**
@@ -36,9 +34,9 @@ public class ApplicationSetting {
      */
     @Data
     public static class PvController {
-        // シリアル通信ポート名
+        /* シリアル通信ポート名 */
         private String comPort;
-        // RS485のユニットID
+        /* RS485のユニットID */
         private Integer unitId;
     }
 
@@ -47,11 +45,11 @@ public class ApplicationSetting {
      */
     @Data
     public static class Ambient {
-        // チャネルID
+        /* チャネルID */
         private Integer channelId;
-        // リードキー
+        /* リードキー */
         private String readKey;
-        // ライトキー
+        /* ライトキー */
         private String writeKey;
     }
 }

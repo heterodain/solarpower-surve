@@ -13,7 +13,7 @@ import com.heterodain.solarpower.config.ApplicationSetting;
 import com.heterodain.solarpower.model.PvData;
 import com.heterodain.solarpower.model.PvDataSummary;
 import com.heterodain.solarpower.service.AmbientService;
-import com.heterodain.solarpower.service.PvService;
+import com.heterodain.solarpower.service.PvControllerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,23 +31,22 @@ public class PvControllerTasks {
     @Autowired
     private ApplicationSetting settings;
     @Autowired
-    private PvService pvService;
+    private PvControllerService pvControllerService;
     @Autowired
     private AmbientService ambientService;
 
     private SerialConnection conn;
 
     private PvDataSummary instant = new PvDataSummary();
-    private PvDataSummary hourly = new PvDataSummary();
+    private PvDataSummary daily = new PvDataSummary();
 
     /**
      * 初期化
      */
     @PostConstruct
     public void init() throws IOException {
-        // PVコントローラーに接続
         var pvcSetting = settings.getDevice().getPvController();
-        log.info("チャージコントローラーに接続します。unitId={}", pvcSetting.getUnitId());
+        log.info("PVコントローラーに接続します。unitId={}", pvcSetting.getUnitId());
 
         var serialParam = new SerialParameters();
         serialParam.setPortName(pvcSetting.getComPort());
@@ -62,24 +61,24 @@ public class PvControllerTasks {
     }
 
     /**
-     * PVコントローラーからデータ取得
+     * 3秒毎にPVコントローラーからデータ取得
      */
     @Scheduled(initialDelay = 3 * 1000, fixedDelay = 3 * 1000)
     public void realtime() {
         try {
-            var data = pvService.readCurrent(settings.getDevice().getPvController(), conn);
+            var data = pvControllerService.readCurrent(settings.getDevice().getPvController(), conn);
             log.debug("{}", data);
 
             synchronized (instant) {
                 instant.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
                         data.getLoadPower());
             }
-            synchronized (hourly) {
-                hourly.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
+            synchronized (daily) {
+                daily.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
                         data.getLoadPower());
             }
         } catch (Exception e) {
-            log.warn("チャージコントローラーへのアクセスに失敗しました。", e);
+            log.warn("PVコントローラーへのアクセスに失敗しました。", e);
         }
     }
 
@@ -96,7 +95,7 @@ public class PvControllerTasks {
             }
             log.debug("Ambientに3分値を送信します。data={}", average);
 
-            ambientService.send(settings.getService().getAmbientRealtime(), ZonedDateTime.now(), average.getPvVolt(),
+            ambientService.send(settings.getService().getAmbient(), ZonedDateTime.now(), average.getPvVolt(),
                     average.getPvPower(), average.getBattVolt(), average.getBattPower(), average.getLoadPower());
         } catch (Exception e) {
             log.warn("Ambientへのデータ送信に失敗しました。", e);
@@ -104,21 +103,20 @@ public class PvControllerTasks {
     }
 
     /**
-     * 1時間毎にAmbientにデータ送信
+     * 1日毎にAmbientにデータ送信
      */
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "10 0 0 * * *") // 3分値の送信と被るので10秒ずらしています
     public void daily() {
         try {
             PvData average;
-            synchronized (hourly) {
-                average = hourly.average();
-                hourly.clear();
+            synchronized (daily) {
+                average = daily.average();
+                daily.clear();
             }
-            log.debug("Ambientに時間値を送信します。data={}", average);
+            log.debug("Ambientに日計値を送信します。data={}", average);
 
-            ambientService.send(settings.getService().getAmbientDaily(),
-                    ZonedDateTime.now().truncatedTo(ChronoUnit.HOURS), average.getPvPower(), average.getBattPower(),
-                    average.getLoadPower());
+            ambientService.send(settings.getService().getAmbient(), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS),
+                    null, null, null, null, null, average.getPvPower(), average.getBattPower(), average.getLoadPower());
         } catch (Exception e) {
             log.warn("Ambientへのデータ送信に失敗しました。", e);
         }
@@ -130,7 +128,7 @@ public class PvControllerTasks {
     @PreDestroy
     public void destroy() {
         if (conn != null) {
-            log.debug("チャージコントローラーを切断します。unitId={}", settings.getDevice().getPvController().getUnitId());
+            log.debug("PVコントローラーを切断します。unitId={}", settings.getDevice().getPvController().getUnitId());
             conn.close();
         }
     }
