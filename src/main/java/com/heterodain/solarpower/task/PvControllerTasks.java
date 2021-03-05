@@ -113,6 +113,9 @@ public class PvControllerTasks {
                 average = daily.average();
                 daily.clear();
             }
+            average.setPvPower(average.getPvPower() * 24);
+            average.setBattPower(average.getBattPower() * 24);
+            average.setLoadPower(average.getLoadPower() * 24);
             log.debug("Ambientに日計値を送信します。data={}", average);
 
             ambientService.send(settings.getService().getAmbientDaily(),
