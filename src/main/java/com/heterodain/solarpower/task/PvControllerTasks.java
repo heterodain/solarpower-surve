@@ -9,11 +9,12 @@ import javax.annotation.PreDestroy;
 
 import com.ghgande.j2mod.modbus.net.SerialConnection;
 import com.ghgande.j2mod.modbus.util.SerialParameters;
-import com.heterodain.solarpower.config.ApplicationSetting;
+import com.heterodain.solarpower.config.DeviceConfig;
+import com.heterodain.solarpower.config.ServiceConfig;
 import com.heterodain.solarpower.model.PvData;
 import com.heterodain.solarpower.model.PvDataSummary;
 import com.heterodain.solarpower.service.AmbientService;
-import com.heterodain.solarpower.service.PvControllerService;
+import com.heterodain.solarpower.device.PvControllerDevice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,9 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PvControllerTasks {
     @Autowired
-    private ApplicationSetting settings;
+    private DeviceConfig deviceConfig;
     @Autowired
-    private PvControllerService pvControllerService;
+    private ServiceConfig serviceConfig;
+
+    @Autowired
+    private PvControllerDevice pvControllerService;
     @Autowired
     private AmbientService ambientService;
 
@@ -45,7 +49,7 @@ public class PvControllerTasks {
      */
     @PostConstruct
     public void init() throws IOException {
-        var pvcSetting = settings.getDevice().getPvController();
+        var pvcSetting = deviceConfig.getPvController();
         log.info("PVコントローラーに接続します。unitId={}", pvcSetting.getUnitId());
 
         var serialParam = new SerialParameters();
@@ -66,7 +70,7 @@ public class PvControllerTasks {
     @Scheduled(initialDelay = 3 * 1000, fixedDelay = 3 * 1000)
     public void realtime() {
         try {
-            var data = pvControllerService.readCurrent(settings.getDevice().getPvController(), conn);
+            var data = pvControllerService.readCurrent(deviceConfig.getPvController(), conn);
             log.debug("{}", data);
 
             synchronized (instant) {
@@ -95,7 +99,7 @@ public class PvControllerTasks {
             }
             log.debug("Ambientに3分値を送信します。data={}", average);
 
-            ambientService.send(settings.getService().getAmbientRealtime(), ZonedDateTime.now(), average.getPvVolt(),
+            ambientService.send(serviceConfig.getAmbientRealtime(), ZonedDateTime.now(), average.getPvVolt(),
                     average.getPvPower(), average.getBattVolt(), average.getBattPower(), average.getLoadPower());
         } catch (Exception e) {
             log.warn("Ambientへのデータ送信に失敗しました。", e);
@@ -105,7 +109,7 @@ public class PvControllerTasks {
     /**
      * 1日毎にAmbientにデータ送信
      */
-    @Scheduled(cron = "10 0 0 * * *") // 3分値の送信と被るので10秒ずらしています
+    @Scheduled(cron = "0 0 0 * * *")
     public void daily() {
         try {
             PvData average;
@@ -118,9 +122,8 @@ public class PvControllerTasks {
             average.setLoadPower(average.getLoadPower() * 24);
             log.debug("Ambientに日計値を送信します。data={}", average);
 
-            ambientService.send(settings.getService().getAmbientDaily(),
-                    ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS), average.getPvPower(), average.getBattPower(),
-                    average.getLoadPower());
+            ambientService.send(serviceConfig.getAmbientDaily(), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS),
+                    average.getPvPower(), average.getBattPower(), average.getLoadPower());
         } catch (Exception e) {
             log.warn("Ambientへのデータ送信に失敗しました。", e);
         }
@@ -132,7 +135,7 @@ public class PvControllerTasks {
     @PreDestroy
     public void destroy() {
         if (conn != null) {
-            log.debug("PVコントローラーを切断します。unitId={}", settings.getDevice().getPvController().getUnitId());
+            log.debug("PVコントローラーを切断します。unitId={}", deviceConfig.getPvController().getUnitId());
             conn.close();
         }
     }

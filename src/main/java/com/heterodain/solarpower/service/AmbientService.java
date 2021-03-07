@@ -13,7 +13,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heterodain.solarpower.config.ApplicationSetting.Ambient;
+import com.heterodain.solarpower.config.ServiceConfig.Ambient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

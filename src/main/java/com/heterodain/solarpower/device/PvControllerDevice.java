@@ -1,12 +1,13 @@
-package com.heterodain.solarpower.service;
+package com.heterodain.solarpower.device;
 
 import com.ghgande.j2mod.modbus.ModbusException;
 import com.ghgande.j2mod.modbus.io.ModbusSerialTransaction;
 import com.ghgande.j2mod.modbus.msg.ReadInputRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadInputRegistersResponse;
 import com.ghgande.j2mod.modbus.net.SerialConnection;
-import com.heterodain.solarpower.config.ApplicationSetting.PvController;
+import com.heterodain.solarpower.config.DeviceConfig.PvController;
 
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -17,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * PVコントローラーサービス
  */
-@Service
+@Component
 @Slf4j
-public class PvControllerService {
+public class PvControllerDevice {
 
     /**
      * リアルタイム情報取得

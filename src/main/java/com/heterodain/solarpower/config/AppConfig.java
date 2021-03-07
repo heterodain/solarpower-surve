@@ -12,7 +12,7 @@ import lombok.var;
  * コンポーネント設定
  */
 @Configuration
-public class ApplicationConfig {
+public class AppConfig {
 
     /**
      * JSONパーサーをDIコンテナに登録
