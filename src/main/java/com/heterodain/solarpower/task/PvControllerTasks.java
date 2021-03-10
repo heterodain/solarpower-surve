@@ -71,8 +71,6 @@ public class PvControllerTasks {
     public void realtime() {
         try {
             var data = pvControllerService.readCurrent(deviceConfig.getPvController(), conn);
-            log.debug("{}", data);
-
             synchronized (instant) {
                 instant.add(data.getPvVolt(), data.getPvPower(), data.getBattVolt(), data.getBattPower(),
                         data.getLoadPower());
