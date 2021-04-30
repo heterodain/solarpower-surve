@@ -9,3 +9,6 @@ https://youtu.be/0v6mcdFbdKQ
 
 Part.3 バッテリーの容量測定と復活の儀式
 https://youtu.be/w3DU3fAgzpg
+
+Part.4 復活の儀式 約1ヶ月後
+https://youtu.be/q_ZRtQihjoY
