@@ -12,3 +12,6 @@ https://youtu.be/w3DU3fAgzpg
 
 Part.4 復活の儀式 約1ヶ月後
 https://youtu.be/q_ZRtQihjoY
+
+### Youtubeチャンネル
+https://www.youtube.com/channel/UCF3MSapjPmcyUBxzDEkMR3A
