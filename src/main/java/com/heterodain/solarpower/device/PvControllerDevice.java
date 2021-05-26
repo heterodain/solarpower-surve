@@ -15,7 +15,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * PVコントローラーサービス
+ * PVコントローラーデバイス
  */
 @Component
 @Slf4j
@@ -30,7 +30,7 @@ public class PvControllerDevice {
      * @throws ModbusException
      */
     public synchronized RealtimeData readCurrent(PvController info, SerialConnection conn) throws ModbusException {
-        ReadInputRegistersRequest req = new ReadInputRegistersRequest(0x3100, 16);
+        ReadInputRegistersRequest req = new ReadInputRegistersRequest(0x3100, 17);
         req.setUnitID(info.getUnitId());
         ModbusSerialTransaction tr = new ModbusSerialTransaction(conn);
         tr.setRequest(req);
@@ -51,11 +51,20 @@ public class PvControllerDevice {
         // * 0x10000) / 100;
         data.battPower = data.pvPower - data.loadPower;
         data.battAmp = data.battPower / data.battVolt;
+        data.battTemp = ((double) res.getRegisterValue(16)) / 100;
 
         // MEMO： Tracerシリーズなど上位機種なら内蔵センサーの温度も取得可能
-        // log.debug("Battery temp: {}", ((double) res.getRegisterValue(16)) / 100);
-        // log.debug("Inside temp: {}", ((double) res.getRegisterValue(17)) / 100);
-        // log.debug("Power temp: {}", ((double) res.getRegisterValue(18)) / 100);
+        // log.debug("Inside temp: {}℃", ((double) res.getRegisterValue(17)) / 100);
+        // log.debug("Power temp: {}℃", ((double) res.getRegisterValue(18)) / 100);
+
+        req = new ReadInputRegistersRequest(0x311A, 1);
+        req.setUnitID(info.getUnitId());
+        tr = new ModbusSerialTransaction(conn);
+        tr.setRequest(req);
+        tr.execute();
+
+        res = (ReadInputRegistersResponse) tr.getResponse();
+        data.battSOC = ((double) res.getRegisterValue(0)) / 100;
 
         req = new ReadInputRegistersRequest(0x3201, 1);
         req.setUnitID(info.getUnitId());
@@ -64,7 +73,6 @@ public class PvControllerDevice {
         tr.execute();
 
         res = (ReadInputRegistersResponse) tr.getResponse();
-
         data.stage = STAGE.values()[(res.getRegisterValue(0) >> 2) & 0x0003];
 
         log.debug("{}", data);
@@ -118,6 +126,9 @@ public class PvControllerDevice {
         public Double loadVolt;
         public Double loadAmp;
         public Double loadPower;
+
+        public Double battTemp;
+        public Double battSOC;
 
         public STAGE stage;
     }
