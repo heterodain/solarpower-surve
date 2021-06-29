@@ -36,14 +36,15 @@ DIY太陽光発電システムから電力量を取得してグラフ化しま�
 1. PCとPVコントローラーをRS485 USBアダプターで接続してください。  
 (Connect PC and PV controller with RS485 USB Adapter)
 
-3. application.ymlを編集して、PVコントローラーやWEBサービスの接続情報を記入してください。  
+2. application.ymlを編集して、PVコントローラーやWEBサービスの接続情報を記入してください。  
 (Edit application.yml and fills connect information of PV Controller and WEB service)  
 
-3. JARモジュール生成 (Create JAR)
-```command
-mvn clean package
-```
-4. 実行 (Execute)
-```command
-java -jar solarpower-surve-1.0.jar
-```
+3. 実行 (Execute)
+    - VS Code上で実行 (Run on VS Code)  
+    App.javaファイルを右クリックして実行 (Right-click and run App.java file)
+  
+    - ターミナル上で実行 (Run on Terminal)  
+        ```command
+        mvn clean package
+        java -jar solarpower-surve-1.0.jar
+        ```
