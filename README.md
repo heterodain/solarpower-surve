@@ -41,7 +41,7 @@ DIY太陽光発電システムから電力量を取得してグラフ化しま�
 
 3. 実行 (Execute)
     - VS Code上で実行 (Run on VS Code)  
-    App.javaファイルを右クリックして実行 (Right-click and run App.java file)
+    App.javaファイルを右クリックして実行 (Right-click on the App.java and run)
   
     - ターミナル上で実行 (Run on Terminal)  
         ```command
