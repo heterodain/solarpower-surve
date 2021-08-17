@@ -2,9 +2,9 @@
 DIY太陽光発電システムから電力量を取得してグラフ化します。  
 (Get Power Information form PV Controller and graphed in "Ambient")
 
-![SpringBoot](https://img.shields.io/badge/SpringBoot-2.4.3-green.svg)
+![SpringBoot](https://img.shields.io/badge/SpringBoot-2.5.3-green.svg)
 ![Lombok](https://img.shields.io/badge/Lombok-1.18.18-green.svg) 
-![Jackson](https://img.shields.io/badge/Jackson-2.11.4-green.svg) 
+![Jackson](https://img.shields.io/badge/Jackson-2.12.4-green.svg) 
 ![j2mod](https://img.shields.io/badge/j2mod-2.7.0-green.svg) 
 
 [PVController (LS1024B)](https://www.epsolarpv.com/product/10.html)  
