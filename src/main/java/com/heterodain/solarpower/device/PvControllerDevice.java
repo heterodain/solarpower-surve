@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.var;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -30,15 +31,15 @@ public class PvControllerDevice {
      * @throws ModbusException
      */
     public synchronized RealtimeData readCurrent(PvController info, SerialConnection conn) throws ModbusException {
-        ReadInputRegistersRequest req = new ReadInputRegistersRequest(0x3100, 17);
+        var req = new ReadInputRegistersRequest(0x3100, 17);
         req.setUnitID(info.getUnitId());
-        ModbusSerialTransaction tr = new ModbusSerialTransaction(conn);
+        var tr = new ModbusSerialTransaction(conn);
         tr.setRequest(req);
         tr.execute();
 
-        ReadInputRegistersResponse res = (ReadInputRegistersResponse) tr.getResponse();
+        var res = (ReadInputRegistersResponse) tr.getResponse();
 
-        RealtimeData data = new RealtimeData();
+        var data = new RealtimeData();
         data.pvVolt = ((double) res.getRegisterValue(0)) / 100;
         data.pvAmp = ((double) res.getRegisterValue(1)) / 100;
         data.pvPower = ((double) res.getRegisterValue(2) + res.getRegisterValue(3) * 0x10000) / 100;
@@ -89,15 +90,15 @@ public class PvControllerDevice {
      * @throws ModbusException
      */
     public synchronized StaticalData readAggregate(PvController info, SerialConnection conn) throws ModbusException {
-        ReadInputRegistersRequest req = new ReadInputRegistersRequest(0x3300, 20);
+        var req = new ReadInputRegistersRequest(0x3300, 20);
         req.setUnitID(info.getUnitId());
-        ModbusSerialTransaction tr = new ModbusSerialTransaction(conn);
+        var tr = new ModbusSerialTransaction(conn);
         tr.setRequest(req);
         tr.execute();
 
-        ReadInputRegistersResponse res = (ReadInputRegistersResponse) tr.getResponse();
+        var res = (ReadInputRegistersResponse) tr.getResponse();
 
-        StaticalData data = new StaticalData();
+        var data = new StaticalData();
         data.dailyPvPower = ((double) res.getRegisterValue(4) + res.getRegisterValue(5) * 0x10000) / 100;
         data.monthlyPvPower = ((double) res.getRegisterValue(6) + res.getRegisterValue(7) * 0x10000) / 100;
         data.annualPvPower = ((double) res.getRegisterValue(8) + res.getRegisterValue(9) * 0x10000) / 100;
