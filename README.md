@@ -48,3 +48,4 @@ DIY太陽光発電システムから電力量を取得してグラフ化しま�
         mvn clean package
         java -jar solarpower-surve-1.0.jar
         ```
+        > jarとapplication.ymlファイルを同一フォルダに置いてから実行 (Put jar and application.yml files in same folder and run)
